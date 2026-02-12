@@ -1,0 +1,135 @@
+Name: Satyam Singh Chauhan
+Assignment: Authentication Flow Debugging
+Environment: Windows PowerShell
+Server: http://localhost:3000
+Email Used: satyamrajput21304@gmail.com
+
+---------------------------------
+           Register
+---------------------------------
+
+PS C:\Users\as\Downloads\broken_auth_assignment-main\broken_auth_assignment-main> curl -Method POST http://localhost:3000/register `
+>>   -Headers @{"Content-Type"="application/json"} `
+>>   -Body '{"email":"satyamrajput21304@gmail.com","password":"Satyamrajput_05"}'
+
+
+StatusCode        : 201
+StatusDescription : Created
+Content           : {"message":"User registered
+                    successfully","email":"satyamrajput21304@gmail.com"}
+RawContent        : HTTP/1.1 201 Created
+                    Connection: keep-alive
+                    Keep-Alive: timeout=5
+                    Content-Length: 80
+                    Content-Type: application/json; charset=utf-8
+                    Date: Thu, 12 Feb 2026 10:00:25 GMT
+                    ETag: W/"50-SUegbIeuaGhFwq+...
+Forms             : {}
+Headers           : {[Connection, keep-alive], [Keep-Alive, timeout=5], [Content-Length, 80],                          [Content-Type, application/json; charset=utf-8]...}                            Images            : {}                                                                             InputFields       : {}                                                                             Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 80
+
+----------------------------------
+           Login 
+---------------------------------- 
+PS C:\Users\as\Downloads\broken_auth_assignment-main\broken_auth_assignment-main> curl -Method POST http://localhost:3000/auth/login `
+>>   -Headers @{"Content-Type"="application/json"} `
+>>   -Body '{"email":"satyamrajput21304@gmail.com","password":"Satyamrajput_05"}'
+
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"message":"OTP sent","loginSessionId":"2mma0stj"}
+RawContent        : HTTP/1.1 200 OK
+                    Connection: keep-alive
+                    Keep-Alive: timeout=5
+                    Content-Length: 50
+                    Content-Type: application/json; charset=utf-8                                                      Date: Thu, 12 Feb 2026 10:01:19 GMT                                                                ETag: W/"32-NLRWDpZyrusEvRPfC7d6...                                            Forms             : {}                                                                             Headers           : {[Connection, keep-alive], [Keep-Alive, timeout=5], [Content-Length, 50],
+                    [Content-Type, application/json; charset=utf-8]...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 50
+
+-------------------------------------
+          Verify OTP
+-------------------------------------
+PS C:\Users\as\Downloads\broken_auth_assignment-main\broken_auth_assignment-main> curl -Method POST http://localhost:3000/auth/verify-otp `
+>>   -Headers @{"Content-Type"="application/json"} `
+>>   -Body '{"loginSessionId":"2mma0stj","otp":"721170"}' `
+>>   -SessionVariable session
+>>
+
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"message":"OTP verified"}
+RawContent        : HTTP/1.1 200 OK
+                    Connection: keep-alive                                                                             Keep-Alive: timeout=5                                                                              Content-Length: 26                                                                                 Content-Type: application/json; charset=utf-8                                                      Date: Thu, 12 Feb 2026 10:02:48 GMT
+                    ETag: W/"1a-Oc8gx27VjOcxi4Vzg/k9...
+Forms             : {}
+Headers           : {[Connection, keep-alive], [Keep-Alive, timeout=5], [Content-Length, 26],
+                    [Content-Type, application/json; charset=utf-8]...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 26
+
+----------------------------------
+         Generate Token
+----------------------------------
+
+PS C:\Users\as\Downloads\broken_auth_assignment-main\broken_auth_assignment-main> curl -Method POST http://localhost:3000/auth/token -WebSession $session
+>>
+
+                                                                                                                                                                                                StatusCode        : 200                                                                                                                                                                         StatusDescription : OK                                                                                                                                                                          Content           : {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNhdHlhbXJh                                                                                                                  anB1dDIxMzA0QGdtYWlsLmNvbSIsInNlc3Npb25JZCI6IjJtbWEwc3RqIiwiaWF0IjoxNzcwODkwNj
+                    AzLCJleHAiOjE3NzA4OTE1MDN9.dnAZ11IU38rIa7rs3...
+RawContent        : HTTP/1.1 200 OK
+                    Connection: keep-alive
+                    Keep-Alive: timeout=5
+                    Content-Length: 245
+                    Content-Type: application/json; charset=utf-8
+                    Date: Thu, 12 Feb 2026 10:03:24 GMT
+                    ETag: W/"f5-xbEFZlAlji1L9xR8nMb...
+Forms             : {}
+Headers           : {[Connection, keep-alive], [Keep-Alive, timeout=5], [Content-Length, 245],
+                    [Content-Type, application/json; charset=utf-8]...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 245
+
+----------------------------------
+         Protected Route
+----------------------------------
+
+PS C:\Users\as\Downloads\broken_auth_assignment-main\broken_auth_assignment-main> curl http://localhost:3000/protected `
+>>   -Headers @{"Authorization"="Bearer "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey> $response = curl -Method POST http://localhost:3000/auth/token -WebSession $session
+>> $token = ($response.Content | ConvertFrom-Json).access_token
+>>
+PS C:\Users\as\Downloads\broken_auth_assignment-main\broken_auth_assignment-main> curl http://localhost:3000/protected `
+>>   -Headers @{"Authorization"="Bearer $token"}
+>>
+
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"message":"Access granted","user":{"email":"satyamrajput21304@gmail.com","sessionId":"2mma0stj","iat":1770890949,"exp":1770891849},"success_flag":"FLAG-c2F0eWFtcmFqcHV0Mj
+                    EzMDRAZ21haWwuY29tX0NPTVBMRVR...
+RawContent        : HTTP/1.1 200 OK
+                    Connection: keep-alive
+                    Keep-Alive: timeout=5
+                    Content-Length: 219
+                    Content-Type: application/json; charset=utf-8
+                    Date: Thu, 12 Feb 2026 10:09:22 GMT
+                    ETag: W/"db-41yuKGxk8JhCNRH3vk7...
+Forms             : {}
+Headers           : {[Connection, keep-alive], [Keep-Alive, timeout=5], [Content-Length, 219], [Content-Type, application/json; charset=utf-8]...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 219
